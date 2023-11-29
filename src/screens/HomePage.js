@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import {Constants} from 'react-native-altibbi';
+import {init} from 'react-native-altibbi';
 
 const styles = StyleSheet.create({
   mainView: {
@@ -23,9 +23,7 @@ const styles = StyleSheet.create({
 });
 const HomePage = props => {
   useEffect(() => {
-    Constants.domain = 'tawuniya.altibb.com';
-    Constants.language = 'en';
-    Constants.token = 'abd';
+    init('tawuniya.altibb.com','en','abd')
   }, []);
 
   const navigate = page => {
