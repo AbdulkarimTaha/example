@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
 });
 const HomePage = props => {
   useEffect(() => {
-    init('tawuniya.altibb.com','en','abd')
+    init('https://tawuniya.altibb.com', 'en', 'abd');
   }, []);
 
   const navigate = page => {
