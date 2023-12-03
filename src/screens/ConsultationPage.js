@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   StyleSheet,
+  Platform,
 } from 'react-native';
 import {
   createConsultation,
@@ -13,7 +14,11 @@ import {
   getConsultationInfo,
   getConsultationList,
   getLastConsultation,
+  getPrescription,
 } from 'react-native-altibbi';
+import {launchImageLibrary} from 'react-native-image-picker';
+import {uploadMedia} from 'react-native-altibbi/src/connection';
+import {PERMISSIONS, request} from 'react-native-permissions';
 
 const styles = StyleSheet.create({
   textInput: {
@@ -79,6 +84,54 @@ const ConsultationPage = props => {
   const [id, setId] = useState();
   const [id2, setId2] = useState();
   const [userId, setUserId] = useState();
+
+  const openImagePicker = () => {
+    const options = {
+      mediaType: 'photo',
+      includeBase64: false,
+      maxHeight: 2000,
+      maxWidth: 2000,
+    };
+
+    launchImageLibrary(options, response => {
+      if (response.didCancel) {
+        console.log('User cancelled image picker');
+      } else if (response.error) {
+        console.log('Image picker error: ', response.error);
+      } else {
+        console.log('RRRRRRR here 2');
+        let imageUri = response.assets[0].uri;
+        console.log('RRRRRRRR', response);
+        const source =
+          Platform.OS === 'android'
+            ? response.assets[0].uri
+            : response.assets[0].uri.replace('file://', '');
+        const fileName = encodeURI(source.replace(/^.*[\\\/]/, ''));
+
+        uploadMedia(source, response.assets[0].type, fileName).then(res => {
+          console.log('RRRRr', res);
+        });
+      }
+    });
+  };
+  const uploadUsingGallery = async () => {
+    let permission = await request(
+      Platform.OS === 'ios'
+        ? PERMISSIONS.IOS.PHOTO_LIBRARY
+        : parseFloat(Platform.Version + '') > 32
+        ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES
+        : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+    );
+    console.log('per', permission);
+    if (
+      permission === 'granted' ||
+      permission === 'limited' ||
+      ['undetermined', 'authorized'].includes(permission)
+    ) {
+      openImagePicker();
+    }
+    return null;
+  };
 
   return (
     <ScrollView style={{backgroundColor: '#F3F3F4'}}>
@@ -183,6 +236,32 @@ const ConsultationPage = props => {
             <Text style={styles.buttonText}>Consultation by id</Text>
           </TouchableOpacity>
         </View>
+        <TouchableOpacity
+          onPress={() => {
+            getPrescription(230).then(async response => {
+              // you have to install RNFetchBlob && Buffer for this code to work
+              /* try {
+                const {
+                  dirs: {DownloadDir, DocumentDir}, // DownloadDir for android  , DocumentDir for ios
+                } = RNFetchBlob.fs;
+                const arrayBuffer = await response.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+                const base64String = buffer.toString('base64');
+                const filePath = DownloadDir + '/my-document12.pdf';
+                await RNFetchBlob.fs.createFile(filePath, base64String, 'base64');
+              } catch (e) {
+                console.log('RRRRRRRR error ', e);
+              }*/
+            });
+          }}
+          style={styles.button}>
+          <Text style={styles.buttonText}>download Prescription</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => uploadUsingGallery()}
+          style={styles.button}>
+          <Text style={styles.buttonText}>uploadImage</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );

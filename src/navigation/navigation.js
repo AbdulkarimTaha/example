@@ -4,7 +4,6 @@ import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import HomePage from '../screens/HomePage';
 import UserPage from '../screens/UserPage';
 import ConsultationPage from '../screens/ConsultationPage';
-import ChatRoom from '../screens/ChatRoom';
 import Chat from '../screens/Chat';
 import WaitingRoom from '../screens/WaitingRoom';
 import Video from '../screens/Video';

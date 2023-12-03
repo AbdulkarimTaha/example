@@ -21,6 +21,7 @@ import {
   GroupChannelHandler,
   GroupChannelModule,
 } from 'react-native-altibbi';
+import {uploadMedia} from 'react-native-altibbi/src/connection';
 
 //   onUserJoined,
 //   onUserLeft,
@@ -220,37 +221,22 @@ const Chat = props => {
     };
 
     launchImageLibrary(options, response => {
-      console.log('RRRRRRRRR response', response);
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
         console.log('Image picker error: ', response.error);
       } else {
-        let imageUri = response.assets[0].originalPath;
+        console.log('RRRRRRR here 2');
+        console.log('RRRRRRRR', response);
+        const source =
+          Platform.OS === 'android'
+            ? response.assets[0].uri
+            : response.assets[0].uri.replace('file://', '');
+        const fileName = encodeURI(source.replace(/^.*[\\\/]/, ''));
 
-        const params = {
-          fileUrl: response.assets[0].originalPath, // Or .fileUrl = FILE_URL (You can also send a file message with a file URL.)
-          fileName: response.assets[0].fileName,
-          thumbnailSizes: [
-            {maxWidth: 100, maxHeight: 100},
-            {maxWidth: 200, maxHeight: 200},
-          ],
-          fileSize: response.assets[0].fileSize,
-        };
-        channelRef.current
-          .sendFileMessage(params)
-          .onSucceeded(message => {
-            console.log('RRRR FileMessage', message);
-            // A file message with detailed configuration is successfully sent to the channel.
-            // By using fileMessage.messageId, fileMessage.fileName, fileMessage.customType, and so on,
-            // you can access the result object from the Sendbird server to check your FileMessageCreateParams configuration.
-            // The current user can receive messages from other users through the onMessageReceived() method of an event handler.
-            const messageId = message.messageId;
-          })
-          .onFailed(e => {
-            console.log('onFailed', e);
-          });
-        console.log('RRRRRRRRR image uri', imageUri);
+        uploadMedia(source, response.assets[0].type, fileName).then(res => {
+          console.log('RRRRr', res);
+        });
       }
     });
   };
@@ -259,11 +245,10 @@ const Chat = props => {
       Platform.OS === 'ios'
         ? PERMISSIONS.IOS.PHOTO_LIBRARY
         : parseFloat(Platform.Version + '') > 32
-        ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES
-        : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+          ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES
+          : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
     );
-
-    console.log('RRRRRRRRR here1 ');
+    console.log('per', permission);
     if (
       permission === 'granted' ||
       permission === 'limited' ||
@@ -294,8 +279,6 @@ const Chat = props => {
       });
     };
     chatStart();
-    console.log('RRRRRRR', messageList);
-    console.log('RRRRRRR 2 data.chat_user_id', data.chat_user_id);
   }, []);
   if (loading) {
     return <ActivityIndicator />;
