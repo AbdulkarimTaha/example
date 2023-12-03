@@ -71,6 +71,7 @@ const WaitingRoom = props => {
   };
 
   const connectFunction = async () => {
+    console.log('RRRRRRR',Constants);
     try {
       await connect({
         cluster: 'eu',

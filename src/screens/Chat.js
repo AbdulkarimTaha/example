@@ -138,7 +138,7 @@ const Chat = props => {
           ? styles.userMessage
           : styles.otherMessage
       }>
-      {item?.message?.includes('attachment') ? (
+      {item?.message?.includes('cdn') ? (
         <Image source={{uri: item.message}} style={{width: 150, height: 150}} />
       ) : (
         <Text style={styles.messageText}>{item.message}</Text>
@@ -226,8 +226,6 @@ const Chat = props => {
       } else if (response.error) {
         console.log('Image picker error: ', response.error);
       } else {
-        console.log('RRRRRRR here 2');
-        console.log('RRRRRRRR', response);
         const source =
           Platform.OS === 'android'
             ? response.assets[0].uri
@@ -235,7 +233,9 @@ const Chat = props => {
         const fileName = encodeURI(source.replace(/^.*[\\\/]/, ''));
 
         uploadMedia(source, response.assets[0].type, fileName).then(res => {
-          console.log('RRRRr', res);
+          sendMessage({
+            message: res.data.url,
+          })
         });
       }
     });
@@ -245,8 +245,8 @@ const Chat = props => {
       Platform.OS === 'ios'
         ? PERMISSIONS.IOS.PHOTO_LIBRARY
         : parseFloat(Platform.Version + '') > 32
-          ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES
-          : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+        ? PERMISSIONS.ANDROID.READ_MEDIA_IMAGES
+        : PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
     );
     console.log('per', permission);
     if (

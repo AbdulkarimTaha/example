@@ -84,6 +84,7 @@ const ConsultationPage = props => {
   const [id, setId] = useState();
   const [id2, setId2] = useState();
   const [userId, setUserId] = useState();
+  const [imageID, setImageID] = useState();
 
   const openImagePicker = () => {
     const options = {
@@ -109,7 +110,7 @@ const ConsultationPage = props => {
         const fileName = encodeURI(source.replace(/^.*[\\\/]/, ''));
 
         uploadMedia(source, response.assets[0].type, fileName).then(res => {
-          console.log('RRRRr', res);
+          setImageID(res?.data?.id);
         });
       }
     });
@@ -144,6 +145,11 @@ const ConsultationPage = props => {
           value={userId}
           onChangeText={text => setUserId(text)}
         />
+        <TouchableOpacity
+          onPress={() => uploadUsingGallery()}
+          style={styles.button}>
+          <Text style={styles.buttonText}>uploadImage</Text>
+        </TouchableOpacity>
         <TextInput
           style={styles.input}
           multiline
@@ -160,6 +166,7 @@ const ConsultationPage = props => {
               question: textBody,
               medium: picked,
               userId,
+              mediaIds: [imageID],
             }).then(res => {
               console.log('RRRRRRRRR', res);
             });
@@ -256,11 +263,6 @@ const ConsultationPage = props => {
           }}
           style={styles.button}>
           <Text style={styles.buttonText}>download Prescription</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => uploadUsingGallery()}
-          style={styles.button}>
-          <Text style={styles.buttonText}>uploadImage</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

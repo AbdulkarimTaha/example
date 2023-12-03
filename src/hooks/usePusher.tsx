@@ -64,7 +64,7 @@ const usePusher = () => {
       await pusherInstance.init({
         apiKey: key,
         cluster: 'eu',
-        authEndpoint: `https://${Constants.domain}/v1/auth/pusher?access-token=${token}`,
+        authEndpoint: `https://${Constants.domain}/v1/auth/pusher?access-token=${Constants.token}`,
         onConnectionStateChange,
         onError,
         onEvent,

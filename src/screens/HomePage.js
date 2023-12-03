@@ -8,14 +8,6 @@ import {
   View,
 } from 'react-native';
 import {init} from 'react-native-altibbi';
-import {launchImageLibrary} from 'react-native-image-picker';
-import {
-  getPrescription,
-  uploadMedia,
-} from 'react-native-altibbi/src/connection';
-import {PERMISSIONS, request} from 'react-native-permissions';
-import {Buffer} from 'buffer';
-import RNFetchBlob from 'rn-fetch-blob';
 
 const styles = StyleSheet.create({
   mainView: {
